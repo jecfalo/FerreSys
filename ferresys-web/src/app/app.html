@@ -1,0 +1,80 @@
+<nav class="navbar navbar-expand-lg border-bottom border-primary border-3 shadow-sm py-3 mb-4 sticky-top">
+  <div class="container">
+    <!-- Brand -->
+    <a class="navbar-brand fw-bold text-white fs-4 d-flex align-items-center gap-2" routerLink="/">
+      <i class="material-icons">storefront</i>
+      FerreSys
+    </a>
+    <button class="navbar-toggler border-0 shadow-none text-white" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <i class="material-icons">menu</i>
+    </button>
+
+    <!-- Navigation -->
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0 fw-medium">
+        <li class="nav-item">
+          <a class="nav-link text-white-50 hover-lift px-3" routerLink="/home" routerLinkActive="text-white fw-semibold" [routerLinkActiveOptions]="{exact:true}">Inicio</a>
+        </li>
+
+        @if(auth.isLoggedIn()){
+          <!-- Vendedor (Todo el que no sea Admin) -->
+          @if (auth.getUserRole() !== 'ADMIN') {
+            <li class="nav-item">
+              <a class="nav-link text-white-50 hover-lift px-3" routerLink="/process-order" routerLinkActive="text-white fw-semibold">Procesar Orden</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link text-white-50 hover-lift px-3" routerLink="/crud-inventory" routerLinkActive="text-white fw-semibold">Inventario</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link text-white-50 hover-lift px-3" routerLink="/crud-products" routerLinkActive="text-white fw-semibold">Productos</a>
+            </li>
+          }
+
+          <!-- Admin -->
+          @if (auth.getUserRole() === 'ADMIN') {
+            <li class="nav-item">
+              <a class="nav-link text-white-50 hover-lift px-3" routerLink="/crud-storage-room" routerLinkActive="text-white fw-semibold">Gestión Bodegas</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link text-warning hover-lift px-3 d-flex align-items-center gap-1" routerLink="/admin" routerLinkActive="text-white fw-semibold">
+                <i class="material-icons fs-6">admin_panel_settings</i>
+                Administración
+              </a>
+            </li>
+          }
+        }
+      </ul>
+
+      <!-- Auth actions -->
+      <div class="d-flex align-items-center gap-3">
+        @if(!auth.isLoggedIn()){
+          <a routerLink="/login-user" class="btn btn-outline-light rounded-pill px-4 hover-lift">Ingresar</a>
+        }
+        @if(auth.isLoggedIn()){
+          <div class="d-flex align-items-center gap-2 text-white bg-white bg-opacity-10 rounded-pill px-3 py-1">
+            <i class="material-icons fs-5">account_circle</i>
+            <span class="small fw-medium">{{ auth.getUserRole() }}</span>
+            <button class="btn btn-sm btn-link text-white text-decoration-none shadow-none ms-2 p-0 d-flex rounded-circle p-1 hover-lift" (click)="onLogout()" title="Cerrar sesión">
+              <i class="material-icons fs-5">logout</i>
+            </button>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+</nav>
+<main class="container py-4 min-vh-100">
+  <router-outlet></router-outlet>
+</main>
+<footer class="bg-dark text-white text-center py-4 mt-auto border-top border-primary border-3">
+  <div class="container">
+    <div class="row justify-content-center mb-3">
+      <div class="col-auto">
+        <a routerLink="/" class="link-light text-decoration-none mx-2"></a>
+      </div>
+    </div>
+  </div>
+  <div class="text-white-50 small">
+    &copy; 2027 Todos los derechos reservados.
+  </div>
+</footer>

@@ -1,0 +1,171 @@
+<div class="row g-4 mt-3">
+  <!-- Columna Izquierda: Data del Cliente y Registro (Master Form) -->
+  <div class="col-lg-4">
+    <div class="card shadow-sm border-0">
+      <div class="card-header bg-primary text-white">
+        <h5 class="mb-0"><i class="bi bi-person-badge me-2"></i>Datos de Facturación</h5>
+      </div>
+      <div class="card-body">
+         <form [formGroup]="masterForm">
+            <!-- Vendedor Determinado por Backend / JWT -->
+            <div class="mb-3">
+              <label class="form-label text-muted small mb-1">Vendedor Actual</label>
+              <input type="text" class="form-control bg-light" [value]="sellerProfile ? sellerProfile.names + ' ' + sellerProfile.surnames : 'Autenticando...'" readonly>
+            </div>
+            
+            <hr>
+            
+            <!-- Switch Especial Consumidor Final -->
+            <div class="form-check form-switch mb-3">
+              <input class="form-check-input" type="checkbox" role="switch" id="cf-switch" formControlName="isConsumidorFinal">
+              <label class="form-check-label fw-bold" for="cf-switch">Consumidor Final</label>
+            </div>
+
+            <!-- Cliente Búsqueda Individual -->
+            <div class="mb-3">
+              <label class="form-label text-muted small mb-1">Documento del Cliente</label>
+              <div class="input-group input-group-sm">
+                 <input type="text" class="form-control" formControlName="document" placeholder="Ingrese CI/NIT..." (keydown.enter)="$event.preventDefault(); searchClient()">
+                 <button class="btn btn-primary" type="button" (click)="searchClient()" [disabled]="masterForm.get('isConsumidorFinal')?.value">
+                   <i class="bi bi-search"></i>
+                 </button>
+              </div>
+              
+              @if(masterForm.get('document')?.invalid && masterForm.get('document')?.touched) {
+                  <div class="text-danger small mt-1">El documento es obligatorio para facturar.</div>
+              }
+
+              @if(clientNotFound) {
+                 <div class="text-danger small mt-1"><i class="bi bi-exclamation-triangle"></i> Cliente no registrado en el sistema.</div>
+              }
+              
+              <!-- Tarjeta de Información Cliente Encontrado -->
+              @if(clientProfile && !clientNotFound) {
+                 <div class="alert alert-success mt-2 p-2 mb-0 border-0 rounded-3 shadow-sm d-flex align-items-center">
+                   <i class="bi bi-person-check fs-2 me-3 text-success"></i>
+                   <div>
+                       <strong class="d-block text-dark">{{clientProfile.names}} {{clientProfile.surnames}}</strong>
+                       <small class="text-muted"><i class="bi bi-card-text me-1"></i>{{clientProfile.document}}</small>
+                   </div>
+                 </div>
+              }
+            </div>
+
+            <hr>
+
+            <!-- Caja Asignada -->
+            <div class="mb-3">
+              <label class="form-label text-muted small mb-1">Caja Registradora</label>
+              <select class="form-select" formControlName="cashRegisterId"
+                [ngClass]="{'is-invalid': masterForm.get('cashRegisterId')?.invalid && masterForm.get('cashRegisterId')?.touched}">
+                 <option [value]="null">Seleccione la caja actual...</option>
+                 @for(c of cashRegisters; track $index) {
+                    <option [value]="c.id">{{c.name}}</option>
+                 }
+              </select>
+              @if(masterForm.get('cashRegisterId')?.invalid && masterForm.get('cashRegisterId')?.touched) {
+                <div class="invalid-feedback">Debe especificar en qué caja está realizando la venta.</div>
+              }
+            </div>
+         </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Columna Derecha: Lector de Código de Barras y Tabla (Detalle/ShoppingCart) -->
+  <div class="col-lg-8">
+     <!-- Input Rápido para Añadir items -->
+     <div class="card shadow-sm border-0 mb-4 bg-light">
+        <div class="card-body p-3">
+           <form [formGroup]="detailForm" class="row g-2 align-items-end" (ngSubmit)="addProductToCart()">
+              <div class="col-md-7">
+                 <label class="form-label mb-1 fw-bold text-primary"><i class="bi bi-upc-scan me-1"></i>Producto (Escáner o Nombre)</label>
+                 <input type="text" class="form-control form-control-lg border-primary shadow-sm" formControlName="barcodeOrName" placeholder="Pistolear o escribir..." #barcodeInput autofocus>
+              </div>
+              <div class="col-md-3">
+                 <label class="form-label mb-1 text-muted small fw-bold">Cantidad</label>
+                 <input type="number" class="form-control form-control-lg text-center" formControlName="quantity" min="1">
+              </div>
+              <div class="col-md-2">
+                 <button type="submit" class="btn btn-success btn-lg w-100 shadow-sm" [disabled]="detailForm.invalid || !detailForm.value.barcodeOrName?.trim()">
+                    <i class="bi bi-cart-plus fs-5"></i>
+                 </button>
+              </div>
+           </form>
+        </div>
+     </div>
+
+     <!-- Tabla Principal de Productos Carrito -->
+     <div class="card shadow-sm border-0">
+        <div class="card-header bg-white border-bottom-0 pt-4 pb-2">
+           <h5 class="mb-0 text-dark fw-bold"><i class="bi bi-receipt me-2 text-primary"></i>Detalle y Resumen</h5>
+        </div>
+        <div class="card-body p-0">
+           <div class="table-responsive">
+              <table class="table table-hover mb-0 align-middle table-borderless table-striped">
+                 <thead class="table-dark text-white opacity-75">
+                    <tr>
+                       <th class="ps-4">Item</th>
+                       <th>Bodega</th>
+                       <th class="text-center">Cant.</th>
+                       <th class="text-end">Precio Un.</th>
+                       <th class="text-end">Monto Total</th>
+                       <th class="pe-4 text-end">Acción</th>
+                    </tr>
+                 </thead>
+                 <tbody>
+                    @for(item of cart; track $index) {
+                       <tr>
+                          <td class="ps-4">
+                             <span class="fw-bold d-block text-dark">{{item.product.name}}</span>
+                             <span class="text-secondary small">Ref/SKU: {{item.product.SKU}}</span>
+                          </td>
+                          <td class="text-muted"><i class="bi bi-box me-1"></i>{{item.storage.name}}</td>
+                          <td class="text-center fw-bold fs-5 text-primary">{{item.quantity}}</td>
+                          <td class="text-end">${{item.product.price | number:'1.2-2'}}</td>
+                          <td class="text-end fw-bold text-dark fs-5">${{item.subtotal | number:'1.2-2'}}</td>
+                          <td class="pe-4 text-end">
+                             <button class="btn btn-sm btn-light text-danger rounded-circle shadow-sm" (click)="removeCartItem($index)" title="Quitar">
+                                <i class="bi bi-x-lg"></i>
+                             </button>
+                          </td>
+                       </tr>
+                    } @empty {
+                       <tr>
+                          <td colspan="6" class="text-center py-5 text-muted bg-white">
+                             <div class="opacity-50">
+                                <i class="bi bi-bag-x fs-1 d-block mb-3"></i>
+                                <span>La canasta de ventas se encuentra vacía.<br>Pistolee un producto para iniciar la venta.</span>
+                             </div>
+                          </td>
+                       </tr>
+                    }
+                 </tbody>
+                 @if(cart.length > 0) {
+                 <tfoot class="bg-light border-top border-2 border-primary">
+                    <tr>
+                       <td colspan="4" class="text-end fw-bold fs-4 align-middle">TOTAL A COBRAR:</td>
+                       <td class="text-end fw-bold fs-3 text-success align-middle">${{totalCalculated | number:'1.2-2'}}</td>
+                       <td></td>
+                    </tr>
+                 </tfoot>
+                 }
+              </table>
+           </div>
+        </div>
+        <div class="card-footer bg-white border-top-0 py-4 text-end pe-4">
+           <!-- Botón gigante de cobrar venta -->
+           <button class="btn btn-primary btn-lg px-5 shadow fw-bold rounded-pill" 
+                   [disabled]="cart.length === 0 || masterForm.invalid || !clientProfile || isProcessing" 
+                   (click)="processOrder()">
+              @if(isProcessing) {
+                 <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                 VALIDANDO FACTURA...
+              } @else {
+                 <i class="bi bi-check-circle-fill me-2 fs-5"></i> PROCESAR Y FACTURAR VENTA
+              }
+           </button>
+        </div>
+     </div>
+  </div>
+</div>

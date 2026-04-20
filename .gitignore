@@ -1,0 +1,9 @@
+# --- BACKEND (Java / Spring Boot) ---
+backend/target/
+backend/.idea/
+backend/*.iml
+
+# --- FRONTEND (Angular) ---
+frontend/node_modules/
+frontend/dist/
+frontend/.angular/

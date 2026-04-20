@@ -1,0 +1,119 @@
+<div class="container py-3 fade-in">
+  <!-- NOT LOGGED IN STATE -->
+  @if (!auth.isLoggedIn()) {
+    <div class="row align-items-center min-vh-75 mt-5">
+      <div class="col-lg-6 text-center text-lg-start mb-5 mb-lg-0">
+        <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-2 rounded-pill mb-3 fw-medium">
+          Sistema de Gestión Integrado
+        </span>
+        <h1 class="display-3 fw-bold text-dark mb-4 lh-sm">
+          Administra tu ferretería con <span class="text-primary">FerreSys</span>
+        </h1>
+        <p class="lead text-muted mb-5 pe-lg-5">
+          Toma el control del inventario, gestiona los productos y automatiza las órdenes de forma rápida e intuitiva. Únete y optimiza tus procesos hoy.
+        </p>
+        <div class="d-flex flex-column flex-sm-row gap-3 justify-content-center justify-content-lg-start">
+          <a routerLink="/login-user" class="btn btn-primary btn-lg px-5 rounded-pill shadow-sm hover-lift d-flex align-items-center justify-content-center gap-2">
+            Iniciar Sesión
+            <i class="material-icons fs-5">arrow_forward</i>
+          </a>
+          <a routerLink="/register-user" class="btn btn-outline-secondary btn-lg px-5 rounded-pill hover-lift bg-white">
+            Registrarse
+          </a>
+        </div>
+      </div>
+      <div class="col-lg-6 position-relative hero-image-container">
+        <!-- Abstract Illustration using icons / shapes -->
+        <div class="hero-illustration p-5 rounded-4 shadow-sm bg-white border d-flex justify-content-center align-items-center hover-lift position-relative overflow-hidden">
+          <div class="bg-primary rounded-circle position-absolute" style="width: 300px; height: 300px; opacity: 0.1; top: -100px; right: -100px;"></div>
+          <div class="bg-secondary rounded-circle position-absolute" style="width: 200px; height: 200px; opacity: 0.05; bottom: -50px; left: -50px;"></div>
+          <div class="text-center position-relative z-1">
+            <i class="material-icons text-primary mb-3" style="font-size: 8rem;">dashboard_customize</i>
+            <h3 class="fw-bold text-dark">Todo en un solo lugar</h3>
+            <p class="text-muted">Potencia y simplicidad para tu negocio.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- LOGGED IN (DASHBOARD) STATE -->
+  @if (auth.isLoggedIn()) {
+    <div class="dashboard-header mb-5">
+      <h2 class="fw-bold d-flex align-items-center gap-2">
+        <i class="material-icons text-primary fs-2">waving_hand</i>
+        Hola, Bienvenido a FerreSys
+      </h2>
+      <p class="text-muted fs-5">¿Qué te gustaría hacer hoy? Selecciona una acción rápida.</p>
+    </div>
+
+    <!-- Quick Action Cards Grid -->
+    <div class="row g-4">
+      <!-- ACTIONS PARA VENDEDOR -->
+      @if (auth.getUserRole() !== 'ADMIN') {
+        <div class="col-md-6 col-lg-4">
+          <a routerLink="/process-order" class="text-decoration-none">
+            <div class="card card-glass h-100 p-4 hover-lift border-0">
+              <div class="icon-circle bg-primary bg-opacity-10 text-primary mb-4 d-inline-flex p-3 rounded-4">
+                <i class="material-icons fs-1">point_of_sale</i>
+              </div>
+              <h4 class="fw-bold text-dark mb-2">Procesar Orden</h4>
+              <p class="text-muted mb-0">Crea una nueva venta, escanea productos y genera la factura.</p>
+            </div>
+          </a>
+        </div>
+
+        <div class="col-md-6 col-lg-4">
+          <a routerLink="/crud-inventory" class="text-decoration-none">
+            <div class="card card-glass h-100 p-4 hover-lift border-0">
+              <div class="icon-circle bg-secondary bg-opacity-10 text-secondary mb-4 d-inline-flex p-3 rounded-4">
+                <i class="material-icons fs-1">inventory</i>
+              </div>
+              <h4 class="fw-bold text-dark mb-2">Inventario</h4>
+              <p class="text-muted mb-0">Consulta el stock disponible y revisa los niveles de productos.</p>
+            </div>
+          </a>
+        </div>
+
+        <div class="col-md-6 col-lg-4">
+          <a routerLink="/crud-products" class="text-decoration-none">
+            <div class="card card-glass h-100 p-4 hover-lift border-0">
+              <div class="icon-circle text-success bg-success bg-opacity-10 mb-4 d-inline-flex p-3 rounded-4">
+                <i class="material-icons fs-1">category</i>
+              </div>
+              <h4 class="fw-bold text-dark mb-2">Gestionar Productos</h4>
+              <p class="text-muted mb-0">Añade o modifica los detalles de los productos del catálogo.</p>
+            </div>
+          </a>
+        </div>
+      }
+
+      <!-- ACTIONS PARA ADMIN -->
+      @if (auth.getUserRole() === 'ADMIN') {
+        <div class="col-md-6 col-lg-4">
+          <a routerLink="/crud-storage-room" class="text-decoration-none">
+            <div class="card card-glass h-100 p-4 hover-lift border-0">
+              <div class="icon-circle text-info bg-info bg-opacity-10 mb-4 d-inline-flex p-3 rounded-4">
+                <i class="material-icons fs-1">warehouse</i>
+              </div>
+              <h4 class="fw-bold text-dark mb-2">Gestión de Bodegas</h4>
+              <p class="text-muted mb-0">Administra ubicaciones físicas y depósitos de la empresa.</p>
+            </div>
+          </a>
+        </div>
+
+        <div class="col-md-6 col-lg-4">
+          <a routerLink="/admin" class="text-decoration-none">
+            <div class="card card-glass h-100 p-4 hover-lift border-0">
+              <div class="icon-circle text-warning bg-warning bg-opacity-10 mb-4 d-inline-flex p-3 rounded-4">
+                <i class="material-icons fs-1">admin_panel_settings</i>
+              </div>
+              <h4 class="fw-bold text-dark mb-2">Administración General</h4>
+              <p class="text-muted mb-0">Configura usuarios, roles y métricas de alto nivel del sistema.</p>
+            </div>
+          </a>
+        </div>
+      }
+    </div>
+  }
+</div>

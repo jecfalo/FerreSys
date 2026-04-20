@@ -1,0 +1,24 @@
+<div class="row justify-content-center align-items-center mt-5 mb-5">
+    <div class="col-12 col-md-10 col-lg-7">
+        <div class="card border-0 shadow-lg p-5" style="border-radius: 20px; background: rgba(255, 255, 255, 0.9);">
+            <div class="text-center mb-4">
+                <div class="bg-primary text-white d-inline-flex justify-content-center align-items-center rounded-circle mb-3 shadow" style="width: 60px; height: 60px;">
+                    <i class="material-icons fs-1 mt-1">person_add</i>
+                </div>
+                <h3 class="text-primary fw-bold tracking-tight">Crear una cuenta</h3>
+                <p class="text-muted">Únete para empezar a gestionar tus compras</p>
+            </div>
+            @if(msg){
+                <div class="alert alert-danger text-center p-3 mb-4 rounded-3 d-flex align-items-center justify-content-center gap-2" role="alert">
+                    <i class="material-icons">error_outline</i>
+                    <span>{{msg}}</span>
+                </div>
+            }
+            <app-forms [fields]="fieldsRegister" btnText="Registrarse ahora" [showCancel]="false" (forSubmit)="registerUser($event)">
+            </app-forms>
+            <div class="text-center mt-4">
+                <p class="text-muted small">¿Ya tienes una cuenta? <a routerLink="/login-user" class="text-primary fw-semibold text-decoration-none hover-lift">Inicia sesión aquí</a></p>
+            </div>
+        </div>
+    </div>
+</div>

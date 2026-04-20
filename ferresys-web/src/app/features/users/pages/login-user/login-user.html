@@ -1,0 +1,22 @@
+<div class="row justify-content-center align-items-center mt-5">
+    <div class="col-12 col-md-8 col-lg-5">
+        <div class="card border-0 shadow-lg p-4" style="border-radius: 20px; background: rgba(255, 255, 255, 0.9);">
+            <div class="text-center mb-4">
+                <div class="bg-primary text-white d-inline-flex justify-content-center align-items-center rounded-circle mb-3 shadow" style="width: 60px; height: 60px;">
+                    <i class="material-icons fs-1 mt-1">person</i>
+                </div>
+                <h3 class="text-primary fw-bold tracking-tight">Bienvenido de vuelta</h3>
+                <p class="text-muted">Inicia sesión para continuar</p>
+            </div>
+            @if (errorMsg) {
+                <div class="alert alert-danger text-center p-3 mb-4 rounded-3 d-flex align-items-center justify-content-center gap-2" role="alert">
+                    <i class="material-icons">error_outline</i>
+                    <span>{{errorMsg}}</span>
+                </div>
+            }
+            <app-forms [fields]="fieldsLogin" btnText="Ingresar al sistema"
+            [showCancel]="true" cancelText="Crear cuenta nueva" (forSubmit)="onLogin($event)" (formCancel)="goToRegister()">
+            </app-forms>
+        </div>
+    </div>
+</div>

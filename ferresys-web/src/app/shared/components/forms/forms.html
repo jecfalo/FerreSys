@@ -1,0 +1,138 @@
+<form [formGroup]="form" class="row p-2 m-0">
+    @for(field of fields; track $index){
+    <div class="mb-3 {{field.colClass || 'col-12'}}">
+        @switch (field.type) {
+        @case('select'){
+        <label [for]="field.name" class="form-label fw-semibold text-secondary small mb-1">{{field.label}}</label>
+        <select [id]="field.name" [formControlName]="field.name" class="form-select bg-light border-light-subtle rounded-3 py-2 px-3 shadow-none">
+            <option value="">Seleccione...</option>
+            @for(opt of field.options; track $index){
+            <option [value]="opt.id || opt">{{opt.name || opt}}</option>
+            }
+        </select>
+        }
+        @case('radio'){
+        <label class="form-label d-block fw-semibold text-secondary small mb-1">{{field.label}}</label>
+        <div class="d-flex gap-3">
+            @for(opt of field.options; track $index){
+            <div class="form-check">
+                <input type="radio" [value]="opt" [formControlName]="field.name" class="form-check=input">
+                <label class="form-check-label">{{opt}}</label>
+            </div>
+            }
+        </div>
+        }
+        @case('searchable-select'){
+            <label class="form-label fw-semibold text-secondary small mb-1">{{field.label}}</label>
+            <div class="dropdown position-relative">
+                <input 
+                    type="text" 
+                    class="form-control bg-light border-light-subtle rounded-3 py-2 px-3 shadow-none" 
+                    [placeholder]="field.readonly ? '' : 'Buscar ' + field.label.toLowerCase() + '...'"
+                    [value]="searchTerms[field.name]"
+                    (input)="!field.readonly && (searchTerms[field.name] = $any($event.target).value); !field.readonly && (dropdownOpen[field.name] = true)"
+                    (focus)="!field.readonly && (dropdownOpen[field.name] = true)"
+                    (blur)="closeDropdownDelay(field.name)"
+                    [readOnly]="field.readonly"
+                    [ngClass]="{
+                      'is-invalid': form.get(field.name)?.invalid && (form.get(field.name)?.dirty || form.get(field.name)?.touched),
+                      'bg-light text-btn-secondary border-secondary-subtle': field.readonly,
+                      'cursor-text': !field.readonly
+                    }"
+                    [style.cursor]="field.readonly ? 'not-allowed' : 'text'"
+                >
+                <i class="bi bi-search position-absolute top-50 end-0 translate-middle-y me-3 text-secondary"></i>
+
+                <ul class="dropdown-menu w-100 shadow mt-1 p-0 overflow-hidden" 
+                    [class.show]="dropdownOpen[field.name] && !field.readonly" 
+                    style="max-height: 250px; overflow-y: auto !important; z-index: 1050;">
+                    
+                    @for(opt of getFilteredOptions(field); track $index){
+                        <li>
+                            <a class="dropdown-item py-2 border-bottom cursor-pointer text-wrap" 
+                               (mousedown)="$event.preventDefault(); selectOption(field, opt)">
+                                {{opt[field.displayKey || '']}}
+                            </a>
+                        </li>
+                    } @empty {
+                        <li><span class="dropdown-item text-muted py-2 fst-italic">No se encontraron resultados</span></li>
+                    }
+                </ul>
+            </div>
+        }
+        @case('checkbox'){
+        <div class="form-check mt-4">
+            <input type="checkbox" [id]="field.name" [formControlName]="field.name" class="form-check-input">
+            <label [for]="field.name" class="form-check-label">{{field.label}}</label>
+        </div>
+        }
+        @default{
+        <label [for]="field.name" class="form-label fw-semibold text-secondary small mb-1">
+            {{field.label}}
+            @if(field.readonly){
+            <i class="bi bi-lock-fill text-secondary ms-1" title="Campo bloqueado"></i>
+            }
+        </label>
+        <input [type]="field.type" [id]="field.name" [formControlName]="field.name" [readOnly]="field.readonly"
+            class="form-control bg-light border-light-subtle rounded-3 py-2 px-3 shadow-none" [ngClass]="{
+            'is-invalid': form.get(field.name)?.invalid && (form.get(field.name)?.dirty || form.get(field.name)?.touched),
+            'bg-light text-btn-secondary border-secondary-subtle': field.readonly
+            }" [style.cursor]="field.readonly? 'not-allowed' : 'text'" [min]="field.minDate" [max]="field.maxDate">
+            @if(field.readonly){
+                <div class="form-text text-warning mt-1">
+                    <i class="bi bi-info-circle"></i> Este campo no puede ser editado
+                </div>
+            }
+        }
+        }
+    
+        <span class="text-danger small">
+            @if (form.get(field.name)?.invalid && (form.get(field.name)?.dirty || form.get(field.name)?.touched)) {
+
+            @if (form.get(field.name)?.errors?.['required']) {
+            <div>{{ field.label }} es requerido.</div>
+            }
+
+            @if (form.get(field.name)?.errors?.['email']) {
+            <div>Formato de correo inválido.</div>
+            }
+
+            @if (form.get(field.name)?.errors?.['min']) {
+            <div>El valor es muy bajo.</div>
+            }
+
+            @if (form.get(field.name)?.errors?.['max']) {
+            <div>El valor es muy alto.</div>
+            }
+
+            @if (form.get(field.name)?.errors?.['minlength']) {
+            <div>Mínimo {{ form.get(field.name)?.errors?.['minlength'].requiredLength }} caracteres.</div>
+            }
+
+            @if (form.get(field.name)?.errors?.['maxlength']) {
+            <div>Máximo {{ form.get(field.name)?.errors?.['maxlength'].requiredLength }} caracteres.</div>
+            }
+
+
+            @if (form.get(field.name)?.errors?.['pattern']) {
+            <div>El formato no es válido (revise números o letras).</div>
+            }
+            }
+        </span>
+    </div>
+    }
+    <div class="modal-footer border-0 px-0 mt-3 d-flex w-100 flex-column flex-sm-row gap-2">
+        @if (showCancel) {
+        <button class="btn btn-outline-secondary px-4 rounded-pill fw-semibold p-2" type="button" (click)="onCancel()" [class.w-100]="true">{{cancelText}}</button>
+        }
+        <button class="btn btn-primary px-4 rounded-pill fw-semibold shadow-sm p-2" [class.w-100]="true" type="button" [disabled]="form.invalid || isLoading"
+            (click)="onSubmit()">
+            @if (isLoading) {
+            <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+            Cargando...
+            }@else {
+            {{btnText}}
+            }
+        </button>
+    </div>
+</form>

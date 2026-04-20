@@ -1,0 +1,30 @@
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <app-tables [title]="'Gestión de inventario'" [data]="inventories" [columns]="columnTables"
+                btnNewText="Nuevo Inventario" (onNew)="openNew()" (onEdit)="openEdit($event)"
+                (onDelete)="deleteInventory($event)">
+            </app-tables>
+        </div>
+    </div>
+</div>
+<div class="modal fade" tabindex="-1" id="inventoryModal" #inventoryModal data-bs-backdrop="static">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title fw-bold">
+                    <i class="bi bi-box-seam me-2"></i>
+                    {{isEditing ? 'Editar Inventario': 'Registrar Nuevo Inventario'}}
+                </h5>
+                <button type="button" class="btn-close btn-close-white" (click)="closeModal()"
+                    aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body bg-light">
+                <app-forms [fields]="formInv" [data]="copyInventories"
+                    [btnText]="isEditing ? 'Actualizar' : 'Guardar Inventario'" [showCancel]="true"
+                    cancelText="Cancelar" [isLoading]="isSaving" (forSubmit)="saveInventory($event)"
+                    (formCancel)="closeModal()"></app-forms>
+            </div>
+        </div>
+    </div>
+</div>
