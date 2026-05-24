@@ -39,7 +39,7 @@ public class InventoryService implements IInventoryService{
         StorageRoom storage = storageRoomRepository.findById(register.storageId())
                 .orElseThrow(()-> new RuntimeException("No existe esa bodega"));
         Inventory inv = new Inventory(register, product, storage);
-        var saveInv = repository.save(inv);
+        Inventory saveInv = repository.save(inv);
         return new ReferenceInventory(saveInv);
     }
 
@@ -57,7 +57,7 @@ public class InventoryService implements IInventoryService{
         Inventory invId = repository.findById(id)
                 .orElseThrow(()-> new RuntimeException("No se encontra el registro"));
         invId.setPhysQuantity(update.physQuantity());
-        var invSave = repository.save(invId);
+        Inventory invSave = repository.save(invId);
         return new ReferenceInventory(invSave);
     }
 

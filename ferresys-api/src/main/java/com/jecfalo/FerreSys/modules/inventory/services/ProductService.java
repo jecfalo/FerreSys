@@ -27,7 +27,7 @@ public class ProductService implements IProductService{
     @Transactional
     public ReferenceProduct create(RegisterProd register) {
         Product create = new Product(register);
-        var savedProduct = repository.save(create);
+        Product savedProduct = repository.save(create);
         return new ReferenceProduct(savedProduct);
     }
 

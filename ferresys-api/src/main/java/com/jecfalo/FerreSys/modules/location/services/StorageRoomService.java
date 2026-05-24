@@ -27,7 +27,7 @@ public class StorageRoomService implements  IStorageRoomService{
     @Transactional
     public ReferenceStorageRoom create(RegisterStorageRoom register) {
         StorageRoom storageRoom = new StorageRoom(register);
-        var saveSR = repository.save(storageRoom);
+        StorageRoom saveSR = repository.save(storageRoom);
         return new ReferenceStorageRoom(saveSR);
     }
 

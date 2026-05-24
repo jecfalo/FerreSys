@@ -18,6 +18,7 @@
     import org.springframework.beans.factory.annotation.Autowired;
     import org.springframework.data.domain.Page;
     import org.springframework.data.domain.Pageable;
+    import org.springframework.security.core.Authentication;
     import org.springframework.security.core.context.SecurityContextHolder;
     import org.springframework.stereotype.Service;
 
@@ -140,7 +141,7 @@
             // de OrderDetailRepository siempre y cuando esté configurado cascade = CascadeType.ALL.
             order.setOrderDetail(details);
             
-            var saveOrder = repository.save(order);
+            Order saveOrder = repository.save(order);
             
             // Retornamos el DTO de respuesta transformando la entidad final guardada
             return new ReferenceOrder(saveOrder);
@@ -184,7 +185,7 @@
             // Flujo 1: Se va a liquidar el pago y finalizar un presupuesto PENDING a PAID
             if(state == PaidState.PENDING && newState == PaidState.PAID){
                 // Preguntamos quién realiza la petición usando Spring Security context
-                var authentication = SecurityContextHolder.getContext().getAuthentication();
+                Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
                 String profileType = authentication.getAuthorities().iterator().next().getAuthority();
                 
                 // Impedimos logísticamente que un cliente (rol) finalice compras a voluntad o piratee el punto de pago online

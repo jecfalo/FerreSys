@@ -1,6 +1,7 @@
 package com.jecfalo.FerreSys.modules.users.services;
 
 import com.jecfalo.FerreSys.modules.users.models.Profile;
+import com.jecfalo.FerreSys.modules.users.models.TypeUser;
 import com.jecfalo.FerreSys.modules.users.records.profile.DataListProfile;
 import com.jecfalo.FerreSys.modules.users.records.profile.ReferenceProfile;
 import com.jecfalo.FerreSys.modules.users.records.profile.UpdateProfileEmail;
@@ -9,6 +10,8 @@ import com.jecfalo.FerreSys.modules.users.repositories.ProfileRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -47,16 +50,36 @@ public class ProfileService implements IProfileService{
 
     @Override
     public ReferenceProfile udateEmail(Long id, UpdateProfileEmail uPE) {
-        return null;
+        Profile profile = repository.findById(id)
+                .orElseThrow(()-> new RuntimeException("No existe un perfil con ese id"));
+        profile.setEmail(uPE.email());
+        Profile updateEmail = repository.save(profile);
+        return new ReferenceProfile(updateEmail);
     }
 
     @Override
     public ReferenceProfile updateRole(Long id, UpdateProfileRole uPR) {
-        return null;
+        Profile profile = repository.findById(id)
+                .orElseThrow(()-> new RuntimeException("No existe un perfil con ese id"));
+        TypeUser typeState = profile.getTypeUser();
+        TypeUser newType = uPR.userType();
+        if(typeState == TypeUser.CLIENT || typeState == TypeUser.SELLER && newType == TypeUser.ADMIN || newType == TypeUser.SELLER) {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            String profileType = authentication.getAuthorities().iterator().next().getAuthority();
+            if (profileType.equals("ROLE_CLIENT") || profileType.equals("ROLE_SELLER")) {
+                throw new RuntimeException("No tienes privilegios necesarios para realizar estos cambios");
+            }
+        }
+        profile.setTypeUser(newType);
+        repository.save(profile);
+        return new ReferenceProfile(profile);
     }
 
     @Override
     public void logicalDelete(Long id) {
-
+        Profile profile = repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("No existe un perfil con ese id"));
+        profile.setActive(false);
+        repository.save(profile);
     }
 }

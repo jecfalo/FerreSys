@@ -9,4 +9,5 @@ import org.springframework.security.core.userdetails.UserDetails;
 public interface UserRepository extends JpaRepository<User, Long> {
     @Query("SELECT u FROM User u JOIN FETCH u.profile WHERE u.username = :username AND u.active = true")
     UserDetails findByUsername(@Param("username") String username);
+
 }

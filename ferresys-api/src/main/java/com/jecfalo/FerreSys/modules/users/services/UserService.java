@@ -36,7 +36,7 @@ public class UserService implements  IUserService{
         //enlazar ambos objetos en el usuario
         profile.setUser(user);//al perfil le asignamos el usuario
         user.setProfile(profile);
-        var saveUser = repository.save(user);
+        User saveUser = repository.save(user);
         //se guarda el por el cascade = all, guardando ambas tablas
         return new ReferenceUser(saveUser);
     }
