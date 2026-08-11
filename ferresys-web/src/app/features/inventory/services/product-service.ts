@@ -6,12 +6,13 @@ import { RegisterProd } from '../models/product/registerProduct';
 import { ReferenceProd } from '../models/product/referenceProd';
 import { UpdateProd } from '../models/product/updateProd';
 import { PageResponse } from '../../../shared/models/pageResponse';
+import { environment } from '../../../../environments/environment.development';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ProductService {
-  private apiUrl = "http://localhost:8080/api/products"
+  private apiUrl = environment.apiUrl+"/products"
   constructor(private http:HttpClient){}
   getProducts():Observable<DataProduct[]>{
     //obtener el page que envia el backend

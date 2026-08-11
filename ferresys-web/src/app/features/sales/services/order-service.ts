@@ -6,12 +6,13 @@ import { map, Observable } from 'rxjs';
 import { RegisterOrder } from '../models/orders/RegisterOrder';
 import { ReferenceOrder } from '../models/orders/ReferenceOrder';
 import { UpdateOrder } from '../models/orders/UpdateOrder';
+import { environment } from '../../../../environments/environment.development';
 
 @Injectable({
   providedIn: 'root',
 })
 export class OrderService {
-  private apiUrl = "http://localhost:8080/api/orders";
+  private apiUrl = environment.apiUrl+"/orders";
   constructor(private http: HttpClient) { }
   getOrders(): Observable<DataListOrder[]> {
     //obtener el page que envia el backend

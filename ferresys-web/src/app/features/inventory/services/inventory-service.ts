@@ -5,12 +5,13 @@ import { ReferenceInv } from '../models/inventory/referenceInv';
 import { PageResponse } from '../../../shared/models/pageResponse';
 import { RegisterInv } from '../models/inventory/registerInventory';
 import { UpdateInventory } from '../models/inventory/UpdateInventory';
+import { environment } from '../../../../environments/environment.development';
 
 @Injectable({
   providedIn: 'root',
 })
 export class InventoryService {
-  private apiUrl = "http://localhost:8080/api/crud-inv";
+  private apiUrl = environment.apiUrl+"/crud-inv";
   constructor(private http: HttpClient) { }
   getInventories(): Observable<ReferenceInv[]> {
     //obtener el page que envia el backend

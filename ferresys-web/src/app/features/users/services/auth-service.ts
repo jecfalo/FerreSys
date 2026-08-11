@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { jwtDecode } from 'jwt-decode';
 import { Observable, tap } from 'rxjs';
+import { environment } from '../../../../environments/environment.development';
 
 /**
  * Servicio central de autenticación y gestión de tokens JWT.
@@ -19,7 +20,7 @@ import { Observable, tap } from 'rxjs';
   providedIn: 'root',
 })
 export class AuthService {
-  private apiUrl = "http://localhost:8080/api";
+  private apiUrl = environment.apiUrl;
   private tokenKey = 'token';
   private refreshTokenKey = 'refreshToken';
 

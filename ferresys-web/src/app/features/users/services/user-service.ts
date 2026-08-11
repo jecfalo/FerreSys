@@ -9,7 +9,7 @@ import { environment } from '../../../../environments/environment.development';
   providedIn: 'root',
 })
 export class UserService {
-  private apiUrl = environment.apiUrl+"/api/users";
+  private apiUrl = environment.apiUrl+"/users";
   constructor(private http:HttpClient){}
   addUser(user: RegisterUser):Observable<ReferenceUser>{
     return this.http.post<ReferenceUser>(this.apiUrl, user);

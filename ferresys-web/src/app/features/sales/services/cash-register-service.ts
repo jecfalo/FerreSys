@@ -2,12 +2,13 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { ReferenceCashRegister } from '../models/cash-register/referenceCashRegister';
+import { environment } from '../../../../environments/environment.development';
 
 @Injectable({
   providedIn: 'root',
 })
 export class CashRegisterService {
-  private apiUrl = "http://localhost:8080/api/cash-registers";
+  private apiUrl = environment.apiUrl+"/cash-registers";
 
   constructor(private http: HttpClient) { }
 

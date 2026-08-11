@@ -6,12 +6,13 @@ import { UpdateProd } from '../models/product/updateProd';
 import { PageResponse } from '../../../shared/models/pageResponse';
 import { RegisterSto } from '../models/store/registerStore';
 import { UpdateStorageRoome } from '../models/store/updateSto';
+import { environment } from '../../../../environments/environment.development';
 
 @Injectable({
   providedIn: 'root',
 })
 export class StorageRoomService {
-  private apiUrl = "http://localhost:8080/api/storages-room"
+  private apiUrl = environment.apiUrl+"/storages-room"
   constructor(private http:HttpClient){}
   getStorages():Observable<ReferenceStorageRoom[]>{
     //obtener el page que envia el backend
