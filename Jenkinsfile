@@ -73,16 +73,37 @@ pipeline {
 
     post {
         success {
-            script { notificar('ÉXITO') }
+            script { notificar('ÉXITO', '#2e7d32') }
         }
         failure {
-            script { notificar('FALLÓ') }
+            script { notificar('FALLÓ', '#c62828') }
+        }
+        fixed {
+            echo 'El pipeline volvió a estar en verde.'
         }
     }
 }
 
-// Notificación del estado del pipeline (canal pendiente de definir: email / Discord / Slack).
-def notificar(String estado) {
-    def msg = "FerreSys #${env.BUILD_NUMBER} (${env.BRANCH_NAME ?: 'main'}): ${estado}\n${env.BUILD_URL}"
-    echo msg
+// Notificación por email (plugin Email Extension + SMTP de Gmail configurado en Jenkins).
+// Los destinatarios NO van en el repo: se leen de la variable NOTIFY_TO, definida en
+// Administrar Jenkins > System > Global properties (lista separada por comas).
+def notificar(String estado, String color) {
+    def destinatarios = env.NOTIFY_TO?.trim()
+    if (!destinatarios) {
+        echo "NOTIFY_TO no está configurada; se omite el email (${estado})."
+        return
+    }
+    emailext(
+        to: destinatarios,
+        subject: "[FerreSys CI] Build #${env.BUILD_NUMBER}: ${estado}",
+        mimeType: 'text/html',
+        attachLog: currentBuild.currentResult != 'SUCCESS',
+        body: """
+            <h2 style="color:${color}">Pipeline FerreSys: ${estado}</h2>
+            <p><b>Build:</b> #${env.BUILD_NUMBER} &middot; <b>Duración:</b> ${currentBuild.durationString.replace(' and counting', '')}</p>
+            <p><b>Commit:</b> ${env.GIT_COMMIT ?: 'n/d'} &middot; <b>Rama:</b> ${env.GIT_BRANCH ?: 'n/d'}</p>
+            <p><b>Pruebas:</b> ver el reporte JUnit del build.</p>
+            <p><a href="${env.BUILD_URL}">Abrir el build en Jenkins</a></p>
+        """
+    )
 }
