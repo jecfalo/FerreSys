@@ -10,8 +10,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
+import java.time.temporal.ChronoUnit;
 
 @Service
 public class TokenService {
@@ -93,11 +92,13 @@ public class TokenService {
         }
     }
 
+    // Se usa Instant (siempre UTC). Antes se tomaba LocalDateTime.now() como si fuera UTC y,
+    // en una máquina con hora de Ecuador (UTC-5), el access token nacía ya vencido.
     private Instant accessTokenExpiration(){
-        return LocalDateTime.now().plusMinutes(ACCESS_TOKEN_MINUTES).toInstant(ZoneOffset.UTC);
+        return Instant.now().plus(ACCESS_TOKEN_MINUTES, ChronoUnit.MINUTES);
     }
 
     private Instant refreshTokenExpiration(){
-        return LocalDateTime.now().plusDays(REFRESH_TOKEN_DAYS).toInstant(ZoneOffset.UTC);
+        return Instant.now().plus(REFRESH_TOKEN_DAYS, ChronoUnit.DAYS);
     }
 }
