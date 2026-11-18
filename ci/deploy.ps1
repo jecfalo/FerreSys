@@ -6,7 +6,8 @@
 #   4. Hace un smoke test contra /v3/api-docs; si no responde, el build falla.
 param(
     [string]$Jar        = "ferresys-api\target\FerreSys-0.0.1-SNAPSHOT.jar",
-    [string]$DeployDir  = "C:\ferresys-deploy",
+    # Carpeta de despliegue: la define el entorno de Jenkins (FERRESYS_DEPLOY_DIR) o se usa C:\ferresys-deploy
+    [string]$DeployDir  = $(if ($env:FERRESYS_DEPLOY_DIR) { $env:FERRESYS_DEPLOY_DIR } else { "C:\ferresys-deploy" }),
     [int]   $Port       = 8081,
     [int]   $TimeoutSec = 90
 )
